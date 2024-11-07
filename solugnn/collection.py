@@ -300,8 +300,8 @@ def get_indices(dataset):
 
 
 def get_sizes(dataset,
-              train_size: float = 0.8):
-    train_size = int(np.round(train_size * len(dataset)))
+              train_frac: float = 0.8):
+    train_size = int(np.round(train_frac * len(dataset)))
     test_size = len(dataset) - train_size
     return train_size, test_size
 
@@ -355,15 +355,8 @@ def get_split_dataset_loaders():
 
 if __name__ == '__main__':
 
-    max_atoms = 100
-    node_vec_len = 60
-    train_size = 0.8
-
-    data_path = '~/projects/soluGNN/data/train.csv'
-    dataset = retrieve_dataset(dataset_path=data_path,
-                               max_atoms=max_atoms,
-                               node_vec_len=node_vec_len)
+    dataset = retrieve_dataset()
     dataset_indices = get_indices(dataset)
-    train_size, test_size = get_sizes(train_size, dataset)
+    train_size, test_size = get_sizes(dataset)
     print(f'Train size: {train_size}')
     print(f'Test size: {test_size}')

@@ -457,30 +457,33 @@ if __name__ == '__main__':
     # Workflow
     from collection import get_split_dataset_loaders
 
-    # Fix Seeds
-    fix_random_seeds()
+    for seed in [0, 42, 64, 13]:
+        # Fix Seeds
+        fix_random_seeds(seed)
 
-    # Create dataloaders
-    dataset, train_loader, test_loader = get_split_dataset_loaders()
+        # Create dataloaders
+        dataset, train_loader, test_loader = get_split_dataset_loaders()
 
-    # Initialize and train model
-    model = initialize_model()
-    loss, mae, epoch, standardizer, loss_fn = train_model(model,
-                                                          dataset,
-                                                          train_loader,
-                                                          verbose=True)
-    # Save trained model
-    # save_model(model, name='test_gcn_v0.pt')
+        # Initialize and train model
+        model = initialize_model()
+        loss, mae, epoch, standardizer, loss_fn = train_model(model,
+                                                              dataset,
+                                                              train_loader,
+                                                              verbose=False)
+        # Save trained model
+        save_model(model, name=f'test_gcn_v0_seed_{seed}.pt')
 
-    # Test trained model
-    test_loss, test_mae, test_rmse = test_model(model,
-                                                test_loader,
-                                                standardizer,
-                                                loss_fn,
-                                                )
-    # Print final results
-    print(f"Training Loss: {loss[-1]:.2f}")
-    print(f"Training MAE: {mae[-1]:.2f}")
-    print(f"Test Loss: {test_loss:.2f}")
-    print(f"Test MAE: {test_mae:.2f}")
-    print(f"Test RMSE: {test_rmse:.2f}")
+        # Test trained model
+        test_loss, test_mae, test_rmse = test_model(model,
+                                                    test_loader,
+                                                    standardizer,
+                                                    loss_fn,
+                                                    )
+        # Print final results
+        print(f"Results for seed {seed}")
+        print(f"Training Loss: {loss[-1]:.2f}")
+        print(f"Training MAE: {mae[-1]:.2f}")
+        print(f"Test Loss: {test_loss:.2f}")
+        print(f"Test MAE: {test_mae:.2f}")
+        print(f"Test RMSE: {test_rmse:.2f}")
+        print('-'*12)
