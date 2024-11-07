@@ -4,7 +4,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 
 
 class Convolutionlayer(nn.Module):
@@ -80,7 +80,7 @@ class ChemGCN(nn.Module):
             n_conv: int,
             n_hidden: int,
             n_outputs: int,
-            p_dropout: float = 0.0,
+            p_dropout: float = 0.1,
     ):
         super().__init__()
 
@@ -341,17 +341,17 @@ def train_all_epochs(model,
 def train_model(model,
                 dataset,
                 train_dataloader,
-                verbose,
-                n_epochs: int = 100
+                verbose: bool = True,
+                n_epochs: int = 100,
+                lr: float = 0.01
                 ):
-    model = initialize_model()
 
     # Standardizer
     outputs = get_outputs(dataset)
     standardizer = initialize_standardizer(outputs)
 
     # Optimizer
-    optimizer = initialize_optimizer(model)
+    optimizer = initialize_optimizer(model, lr)
 
     # Loss function
     loss_fn = initialize_loss()
@@ -366,12 +366,12 @@ def train_model(model,
                                         n_epochs=n_epochs
                                         )
 
-    return loss, mae, epoch
+    return loss, mae, epoch, standardizer, loss_fn
 
 
-def fix_random_seeds():
-    np.random.seed(42)
-    torch.manual_seed(42)
+def fix_random_seeds(seed: int = 42):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
 
 def save_model(model,
@@ -379,6 +379,78 @@ def save_model(model,
                name: str = None):
     full_path = path + name
     torch.save(model.state_dict(), full_path)
+
+
+def test_model(
+        model,
+        test_dataloader,
+        standardizer,
+        loss_fn,
+        use_GPU: bool = True,
+        max_atoms: int = 100,
+        node_vec_len: int = 60,
+        ):
+
+    # Store loss and error
+    test_loss = 0
+    test_mae = 0
+    count = 0
+
+    # Store all outputs and predictions for R2
+    all_outputs = []
+    all_predictions = []
+
+    # Switch to inference mode
+    model.eval()
+
+    # Go over batches of test set
+    for i, dataset in enumerate(test_dataloader):
+        # Unpack data
+        node_mat = dataset[0][0]
+        adj_mat = dataset[0][1]
+        output = dataset[1]
+
+        # Reshape
+        first_dim = int((torch.numel(node_mat)) / (max_atoms * node_vec_len))
+        node_mat = node_mat.reshape(first_dim, max_atoms, node_vec_len)
+        adj_mat = adj_mat.reshape(first_dim, max_atoms, max_atoms)
+
+        # Standardize output
+        output_std = standardizer.standardize(output)
+
+        # Package inputs and outputs to GPU
+        if use_GPU:
+            nn_input = (node_mat.cuda(), adj_mat.cuda())
+            nn_output = output_std.cuda()
+        else:
+            nn_input = (node_mat, adj_mat)
+            nn_output = output_std
+
+        # Compute output
+        nn_prediction = model(*nn_input)
+
+        # Calculate loss
+        loss = loss_fn(nn_output, nn_prediction)
+        test_loss += loss
+
+        # Calculate MAE
+        prediction = standardizer.restore(nn_prediction.detach().cpu())
+        mae = mean_absolute_error(output, prediction)
+        test_mae += mae
+
+        # Store predictions and actual values for R²
+        all_predictions.extend(prediction.numpy().flatten())
+        all_outputs.extend(output.numpy().flatten())
+
+        # Increase count
+        count += 1
+
+    # Calculate avg loss, MAE, R2
+    test_loss = test_loss / count
+    test_mae = test_mae / count
+    test_rmse = root_mean_squared_error(all_outputs, all_predictions)
+
+    return test_loss, test_mae, test_rmse
 
 
 if __name__ == '__main__':
@@ -391,16 +463,24 @@ if __name__ == '__main__':
     # Create dataloaders
     dataset, train_loader, test_loader = get_split_dataset_loaders()
 
-    # Initialize model, standardizer, optimizer and loss functions
-    # Model
+    # Initialize and train model
     model = initialize_model()
+    loss, mae, epoch, standardizer, loss_fn = train_model(model,
+                                                          dataset,
+                                                          train_loader,
+                                                          verbose=True)
+    # Save trained model
+    # save_model(model, name='test_gcn_v0.pt')
 
-    loss, mae, epoch = train_model(model,
-                                   dataset,
-                                   train_loader,
-                                   verbose=True)
-    save_model(model, name='test_gcn_v0.pt')
-    
-    import matplotlib.pyplot as plt
-
-    plt.plot(epoch, loss)
+    # Test trained model
+    test_loss, test_mae, test_rmse = test_model(model,
+                                                test_loader,
+                                                standardizer,
+                                                loss_fn,
+                                                )
+    # Print final results
+    print(f"Training Loss: {loss[-1]:.2f}")
+    print(f"Training MAE: {mae[-1]:.2f}")
+    print(f"Test Loss: {test_loss:.2f}")
+    print(f"Test MAE: {test_mae:.2f}")
+    print(f"Test RMSE: {test_rmse:.2f}")
