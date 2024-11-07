@@ -263,7 +263,7 @@ def run_epoch(
             )
 
     # Return loss and MAE
-    return avg_loss, avg_mae
+    return avg_loss.item(), avg_mae
 
 
 def initialize_model(node_vec_len: int = 60,
@@ -314,7 +314,7 @@ def train_all_epochs(model,
                      optimizer,
                      loss_fn,
                      standardizer,
-                     n_epochs: int = 100,
+                     n_epochs,
                      verbose: bool = False
                      ):
     loss = []
@@ -342,6 +342,7 @@ def train_model(model,
                 dataset,
                 train_dataloader,
                 verbose,
+                n_epochs: int = 100
                 ):
     model = initialize_model()
 
@@ -362,6 +363,7 @@ def train_model(model,
                                         loss_fn=loss_fn,
                                         standardizer=standardizer,
                                         verbose=verbose,
+                                        n_epochs=n_epochs
                                         )
 
     return loss, mae, epoch
@@ -398,9 +400,7 @@ if __name__ == '__main__':
                                    train_loader,
                                    verbose=True)
     save_model(model, name='test_gcn_v0.pt')
-
-    mae = mae.cpu()
-    epoch = epoch.cpu()
+    
     import matplotlib.pyplot as plt
 
     plt.plot(epoch, loss)
