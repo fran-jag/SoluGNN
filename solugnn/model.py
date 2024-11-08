@@ -245,6 +245,56 @@ class Standardizer:
         self.std = state['std']
 
 
+def initialize_model(
+    node_vec_len: int = 60,
+    node_fea_len: int = 60,
+    hidden_fea_len: int = 60,
+    n_conv: int = 4,
+    n_hidden: int = 2,
+    n_outputs: int = 1,
+    p_dropout: float = 0.1,
+    use_GPU: bool = True,
+) -> ChemGCN:
+    """
+    Initialize the ChemGCN model.
+
+    Args:
+        node_vec_len (int, optional): Length of input node vector.
+            Defaults to 60.
+        node_fea_len (int, optional): Length of node feature vector.
+            Defaults to 60.
+        hidden_fea_len (int, optional): Length of hidden feature vector.
+            Defaults to 60.
+        n_conv (int, optional): Number of convolutional layers.
+            Defaults to 4.
+        n_hidden (int, optional): Number of hidden layers.
+            Defaults to 2.
+        n_outputs (int, optional): Number of output features.
+            Defaults to 1.
+        p_dropout (float, optional): Dropout probability.
+            Defaults to 0.1.
+        use_GPU (bool, optional): Whether to use GPU.
+            Defaults to True.
+
+    Returns:
+        ChemGCN: Initialized ChemGCN model.
+    """
+    # Model
+    model = ChemGCN(
+        node_vec_len,
+        node_fea_len,
+        hidden_fea_len,
+        n_conv,
+        n_hidden,
+        n_outputs,
+        p_dropout,
+    )
+    # Transfer to GPU
+    if use_GPU:
+        model.cuda()
+    return model
+
+
 def run_epoch(
     epoch,
     model,
@@ -267,10 +317,14 @@ def run_epoch(
         optimizer (Optimizer): Optimizer for updating the model parameters.
         loss_fn (callable): Loss function.
         standardizer (Standardizer): Standardizer for the outputs.
-        use_GPU (bool, optional): Whether to use GPU. Defaults to True.
-        max_atoms (int, optional): Maximum number of atoms. Defaults to 100.
-        node_vec_len (int, optional): Length of node vector. Defaults to 60.
-        verbose (bool, optional): Whether to print progress. Defaults to False.
+        use_GPU (bool, optional): Whether to use GPU.
+            Defaults to True.
+        max_atoms (int, optional): Maximum number of atoms.
+            Defaults to 100.
+        node_vec_len (int, optional): Length of node vector.
+            Defaults to 60.
+        verbose (bool, optional): Whether to print progress.
+            Defaults to False.
 
     Returns:
         tuple: Average loss and average mean absolute error (MAE).
@@ -328,56 +382,6 @@ def run_epoch(
             )
     # Return loss and MAE
     return avg_loss.item(), avg_mae
-
-
-def initialize_model(
-    node_vec_len: int = 60,
-    node_fea_len: int = 60,
-    hidden_fea_len: int = 60,
-    n_conv: int = 4,
-    n_hidden: int = 2,
-    n_outputs: int = 1,
-    p_dropout: float = 0.1,
-    use_GPU: bool = True,
-) -> ChemGCN:
-    """
-    Initialize the ChemGCN model.
-
-    Args:
-        node_vec_len (int, optional): Length of input node vector.
-            Defaults to 60.
-        node_fea_len (int, optional): Length of node feature vector.
-            Defaults to 60.
-        hidden_fea_len (int, optional): Length of hidden feature vector.
-            Defaults to 60.
-        n_conv (int, optional): Number of convolutional layers.
-            Defaults to 4.
-        n_hidden (int, optional): Number of hidden layers.
-            Defaults to 2.
-        n_outputs (int, optional): Number of output features.
-            Defaults to 1.
-        p_dropout (float, optional): Dropout probability.
-            Defaults to 0.1.
-        use_GPU (bool, optional): Whether to use GPU.
-            Defaults to True.
-
-    Returns:
-        ChemGCN: Initialized ChemGCN model.
-    """
-    # Model
-    model = ChemGCN(
-        node_vec_len,
-        node_fea_len,
-        hidden_fea_len,
-        n_conv,
-        n_hidden,
-        n_outputs,
-        p_dropout,
-    )
-    # Transfer to GPU
-    if use_GPU:
-        model.cuda()
-    return model
 
 
 def get_outputs(dataset):
