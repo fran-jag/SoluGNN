@@ -187,7 +187,9 @@ def get_best_parameters(client):
     return parameters
 
 
-def auto_optimize(n_models: int = 1, save: bool = False):
+def auto_optimize(n_models: int = 1,
+                  save: bool = False,
+                  model_name: str = 'gcn_v0.pt'):
     """
     Automatically optimize the GCN model using Bayesian optimization.
 
@@ -278,9 +280,9 @@ def auto_optimize(n_models: int = 1, save: bool = False):
     if save:
         save_model(
             model,
-            name='optimized_gcn.pt',
+            name=model_name,
         )
-        print("Model saved as 'optimized_gcn.pt'")
+        print(f"Model saved as {model_name}")
 
     return model, rmse
 

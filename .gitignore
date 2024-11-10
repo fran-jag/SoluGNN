@@ -1,2 +1,5 @@
 /data/
 /models/
+/notebooks/
+.vscode/
+.venv/

@@ -536,7 +536,7 @@ def fix_random_seeds(seed: int = 42):
 
 def save_model(model, path: str = '../models/', name: str = 'model.pth'):
     """
-    Save the model's state dictionary.
+    Save the model.
 
     Args:
         model (nn.Module): The model to save.
@@ -546,7 +546,7 @@ def save_model(model, path: str = '../models/', name: str = 'model.pth'):
             Defaults to 'model.pth'.
     """
     full_path = path + name
-    torch.save(model.state_dict(), full_path)
+    torch.save(model, full_path)
 
 
 def test_model(

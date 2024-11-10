@@ -40,8 +40,8 @@ class Graph:
     def __init__(
         self,
         molecule_smiles: str,
-        node_vec_len: int,
-        max_atoms: int = None,
+        node_vec_len: int = 60,
+        max_atoms: int = 100,
     ) -> None:
         """
         Initialize Graph object by converting a SMILES string to a graph.
@@ -164,8 +164,8 @@ class GraphDataset(Dataset):
     def __init__(
         self,
         dataset_path: str,
-        node_vec_len: int,
-        max_atoms: int,
+        node_vec_len: int = 60,
+        max_atoms: int = 100,
     ) -> None:
         """
         Initializes the GraphDataset by loading data from a CSV file.
@@ -296,17 +296,51 @@ def retrieve_dataset(
 
 
 def get_indices(dataset):
+    """
+    Generates an array of sequential indices for the given dataset.
+
+    Args:
+        dataset (Dataset): The dataset for which to generate indices.
+
+    Returns:
+        numpy.ndarray: An array of indices for the dataset.
+    """
     return np.arange(0, len(dataset), 1)
 
 
 def get_sizes(dataset,
               train_frac: float = 0.8):
+    """
+    Calculates samples for training and testing based on the given fraction.
+
+    Args:
+        dataset (Dataset): The dataset for which to determine train/test sizes.
+        train_frac (float, optional): Fraction of samples for training.
+            Defaults to 0.8.
+
+    Returns:
+        tuple: Tuple containing:
+            - int: Number of samples for training.
+            - int: Number of samples for testing.
+    """
     train_size = int(np.round(train_frac * len(dataset)))
     test_size = len(dataset) - train_size
     return train_size, test_size
 
 
 def sample_train_test(dataset_indices, train_size):
+    """
+    Randomly samples indices for training and testing.
+
+    Args:
+        dataset_indices (numpy.ndarray): Array of dataset indices.
+        train_size (int): Number of samples to allocate for training.
+
+    Returns:
+        tuple: Tuple containing:
+            - numpy.ndarray: Indices for training.
+            - numpy.ndarray: Indices for testing.
+    """
     train_indices = np.random.choice(dataset_indices,
                                      size=train_size,
                                      replace=False)
@@ -315,12 +349,52 @@ def sample_train_test(dataset_indices, train_size):
 
 
 def get_dataloader(dataset,
-                   train_indices,
-                   test_indices,
                    batch_size: int = 32):
-    # Create dataloaders
+    """
+    Creates DataLoader objects for single dataset.
+
+    Args:
+        dataset (Dataset): The dataset to be loaded.
+
+        batch_size (int, optional): Number of samples per batch.
+            Defaults to 32.
+
+    Returns:
+        DataLoader: DataLoader for data.
+    """
+
+    # Create DataLoader
+    loader = DataLoader(dataset,
+                        batch_size=batch_size,
+                        collate_fn=collate_graph_dataset)
+
+    return loader
+
+
+def get_dataloaders(dataset,
+                    train_indices,
+                    test_indices,
+                    batch_size: int = 32):
+    """
+    Creates DataLoader objects for training and testing.
+
+    Args:
+        dataset (Dataset): The dataset to be loaded.
+        train_indices (numpy.ndarray): Indices for training samples.
+        test_indices (numpy.ndarray): Indices for testing samples.
+        batch_size (int, optional): Number of samples per batch.
+            Defaults to 32.
+
+    Returns:
+        tuple: Tuple containing:
+            - DataLoader: DataLoader for training data.
+            - DataLoader: DataLoader for testing data.
+    """
+    # Randomly sample from indices
     train_sampler = SubsetRandomSampler(train_indices)
     test_sampler = SubsetRandomSampler(test_indices)
+
+    # Create DataLoaders
     train_loader = DataLoader(dataset,
                               batch_size=batch_size,
                               sampler=train_sampler,
@@ -334,7 +408,15 @@ def get_dataloader(dataset,
 
 
 def get_split_dataset_loaders():
-    # Split data into train and test
+    """
+    Retrieves dataset and splits it into train and test DataLoader objects.
+
+    Returns:
+        tuple: Tuple containing:
+            - GraphDataset: The loaded dataset.
+            - DataLoader: DataLoader for training data.
+            - DataLoader: DataLoader for testing data.
+    """
     # Get sizes
     dataset = retrieve_dataset()
     dataset_indices = get_indices(dataset)
@@ -345,10 +427,10 @@ def get_split_dataset_loaders():
                                                     train_size)
 
     # Create dataloaders
-    train_loader, test_loader = get_dataloader(dataset,
-                                               train_indices,
-                                               test_indices,
-                                               )
+    train_loader, test_loader = get_dataloaders(dataset,
+                                                train_indices,
+                                                test_indices,
+                                                )
 
     return dataset, train_loader, test_loader
 
