@@ -49,7 +49,7 @@ Solvation free energy: -3.50 ± 0.12
 
 ## Dependencies
 - **PyTorch**: For defining and training the GCN.
-- **Ax (from Facebook)**: For Bayesian optimization.
+- **Ax-platform (Meta)**: For Bayesian optimization.
 - **RDKit**: For chemical data processing (SMILES to graph).
 
 ## Notes

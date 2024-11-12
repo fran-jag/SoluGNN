@@ -35,7 +35,11 @@ Usage:
     pred = service.get_pred(smile='CCO')  # For a single model
 """
 from optimization import auto_optimize
-from model import initialize_standardizer, get_outputs
+from model import (initialize_standardizer,
+                   get_outputs,
+                   ChemGCN,
+                   ConvolutionLayer,
+                   PoolingLayer)
 from collection import retrieve_dataset, Graph
 from config import settings
 import torch
@@ -70,6 +74,17 @@ class ModelService:
         self.outputs = get_outputs(retrieve_dataset())
         self.standardizer = initialize_standardizer(self.outputs)
 
+    def _set_globals(self):
+        torch.serialization.add_safe_globals([set,
+                                              ChemGCN,
+                                              ConvolutionLayer,
+                                              PoolingLayer,
+                                              torch.nn.Linear,
+                                              torch.nn.modules.container.ModuleList,  # noqa: E501
+                                              torch.nn.modules.activation.LeakyReLU,  # noqa: E501
+                                              torch.nn.modules.dropout.Dropout,
+                                              ])
+
     def load_model(self):
         """
         Loads or builds a single model from a specified file path.
@@ -103,7 +118,7 @@ class ModelService:
                 return "Unknown input. Try again."
 
         # Load model and set to evaluation mode
-        self.model = torch.load(model_path, weights_only=False)
+        self.model = torch.load(model_path, weights_only=True)
         self.model.eval()
         print(f'Model {settings.model_name} loaded.')
 
@@ -147,8 +162,11 @@ class ModelService:
             else:
                 return "Unknown input. Try again."
 
-        self.models = [torch.load(model_name) for model_name in model_names]
+        self.models = [torch.load(model_name, weights_only=True)
+                       for model_name in model_names]
+
         self.models = [model.eval() for model in self.models]
+
         print(f'{len(self.models)} models found and loaded.')
 
     def get_pred(self, smile, model=None):
