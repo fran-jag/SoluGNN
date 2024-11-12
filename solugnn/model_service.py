@@ -1,4 +1,6 @@
 from optimization import auto_optimize
+from model import initialize_standardizer, get_outputs
+from collection import retrieve_dataset, Graph
 
 from pathlib import Path
 import torch
@@ -10,6 +12,8 @@ class ModelService:
         self.model = None
         self.models = []
         self.multi_model = multi_model
+        self.outputs = get_outputs(retrieve_dataset())
+        self.standardizer = initialize_standardizer(self.outputs)
 
     def load_model(self, model_name='gcn_v1.pt'):
 
@@ -73,3 +77,53 @@ class ModelService:
         self.models = [torch.load(model_name) for model_name in model_names]
         self.models = [model.eval() for model in self.models]
         print(f'{len(self.models)} models found and loaded.')
+
+    def get_pred(self,
+                 smile,
+                 model=None,
+                 ):
+
+        if model is None:
+            model = self.model
+
+        mol_graph = Graph(smile)
+        node_mat = mol_graph.node_mat
+        adj_mat = mol_graph.adj_mat
+        max_atoms = mol_graph.max_atoms
+        node_vec_len = mol_graph.node_vec_len
+
+        # Reshape inputs
+        first_dim = int((torch.numel(torch.Tensor(node_mat)) /
+                         (max_atoms * node_vec_len)))
+
+        node_mat = node_mat.reshape(first_dim, max_atoms, node_vec_len)
+        adj_mat = adj_mat.reshape(first_dim, max_atoms, max_atoms)
+
+        # Package inputs; send to GPU
+        nn_input = (torch.Tensor(node_mat).cuda(),
+                    torch.Tensor(adj_mat).cuda())
+
+        # Predict
+        output = model(*nn_input)
+        output = self.standardizer.restore(output.detach().cpu())
+
+        return output.item()
+
+    def get_preds(self,
+                  smile,
+                  ):
+
+        assert self.multi_model is True, "multi_models is set to False. Use get_pred()"  # noqa: E501
+
+        outputs = []
+
+        for model in self.models:
+            outputs.append(self.get_pred(smile,
+                           model=model))
+
+        outputs_mean = sum(outputs) / len(outputs)
+        outputs_SS = sum([(x - outputs_mean)**2 for x in outputs])
+        outputs_var = outputs_SS / len(outputs)
+        outputs_std = outputs_var ** 0.5
+
+        return outputs_mean, outputs_std
