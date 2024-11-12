@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data.sampler import SubsetRandomSampler
+from config import settings
 
 from rdkit import Chem
 from rdkit.Chem import rdmolops, rdDistGeom
@@ -40,8 +41,8 @@ class Graph:
     def __init__(
         self,
         molecule_smiles: str,
-        node_vec_len: int = 60,
-        max_atoms: int = 100,
+        node_vec_len: int = settings.node_vec_len,
+        max_atoms: int = settings.max_atoms,
     ) -> None:
         """
         Initialize Graph object by converting a SMILES string to a graph.
@@ -164,8 +165,8 @@ class GraphDataset(Dataset):
     def __init__(
         self,
         dataset_path: str,
-        node_vec_len: int = 60,
-        max_atoms: int = 100,
+        node_vec_len: int = settings.node_vec_len,
+        max_atoms: int = settings.max_atoms,
     ) -> None:
         """
         Initializes the GraphDataset by loading data from a CSV file.
@@ -269,9 +270,9 @@ def collate_graph_dataset(dataset: Dataset):
 
 
 def retrieve_dataset(
-    max_atoms: int = 100,
-    node_vec_len: int = 60,
-    dataset_path: str = '~/projects/soluGNN/data/train.csv',
+    max_atoms: int = settings.max_atoms,
+    node_vec_len: int = settings.node_vec_len,
+    dataset_path: str = settings.data_file_name,
 ) -> GraphDataset:
     """
     Retrieves the GraphDataset from the given CSV file path.
@@ -349,7 +350,7 @@ def sample_train_test(dataset_indices, train_size):
 
 
 def get_dataloader(dataset,
-                   batch_size: int = 32):
+                   batch_size: int = settings.batch_size):
     """
     Creates DataLoader objects for single dataset.
 
@@ -374,7 +375,7 @@ def get_dataloader(dataset,
 def get_dataloaders(dataset,
                     train_indices,
                     test_indices,
-                    batch_size: int = 32):
+                    batch_size: int = settings.batch_size):
     """
     Creates DataLoader objects for training and testing.
 

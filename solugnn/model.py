@@ -47,6 +47,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+from config import settings
 
 
 class ConvolutionLayer(nn.Module):
@@ -291,14 +292,14 @@ class Standardizer:
 
 
 def initialize_model(
-    node_vec_len: int = 60,
-    node_fea_len: int = 60,
-    hidden_fea_len: int = 60,
-    n_conv: int = 4,
-    n_hidden: int = 2,
-    n_outputs: int = 1,
-    p_dropout: float = 0.1,
-    use_GPU: bool = True,
+    node_vec_len: int = settings.node_vec_len,
+    node_fea_len: int = settings.node_vec_len,
+    hidden_fea_len: int = settings.node_vec_len,
+    n_conv: int = settings.n_conv,
+    n_hidden: int = settings.n_hidden,
+    n_outputs: int = settings.n_outputs,
+    p_dropout: float = settings.p_dropout,
+    use_GPU: bool = settings.use_GPU,
 ) -> ChemGCN:
     """
     Initialize the ChemGCN model.
@@ -455,7 +456,8 @@ def initialize_standardizer(outputs):
     return Standardizer(torch.Tensor(outputs))
 
 
-def initialize_optimizer(model, lr: float = 0.01):
+def initialize_optimizer(model,
+                         lr: float = settings.learning_rate):
     """
     Initialize the optimizer.
 
@@ -527,8 +529,8 @@ def train_model(
     dataset,
     train_dataloader,
     verbose: bool = True,
-    n_epochs: int = 100,
-    lr: float = 0.01,
+    n_epochs: int = settings.n_epochs,
+    lr: float = settings.learning_rate,
 ):
     """
     Train the model.
@@ -579,7 +581,9 @@ def fix_random_seeds(seed: int = 42):
     torch.manual_seed(seed)
 
 
-def save_model(model, path: str = '../models/', name: str = 'model.pth'):
+def save_model(model,
+               path=settings.model_path,
+               name: str = 'model.pth'):
     """
     Save the model.
 
@@ -590,7 +594,7 @@ def save_model(model, path: str = '../models/', name: str = 'model.pth'):
         name (str, optional): Name of the model file.
             Defaults to 'model.pth'.
     """
-    full_path = path + name
+    full_path = f"{path.as_posix()}/{name}"
     torch.save(model, full_path)
 
 
@@ -599,9 +603,9 @@ def test_model(
     test_dataloader,
     standardizer,
     loss_fn,
-    use_GPU: bool = True,
-    max_atoms: int = 100,
-    node_vec_len: int = 60,
+    use_GPU: bool = settings.use_GPU,
+    max_atoms: int = settings.max_atoms,
+    node_vec_len: int = settings.node_vec_len,
 ):
     """
     Evaluate the model on the test dataset.
@@ -674,7 +678,7 @@ if __name__ == '__main__':
     # Workflow
     from collection import get_split_dataset_loaders
 
-    for seed in [128, 69]:
+    for seed in [6969]:
         # Fix Seeds
         fix_random_seeds(seed)
 
@@ -686,7 +690,7 @@ if __name__ == '__main__':
         loss, mae, epoch, standardizer, loss_fn = train_model(model,
                                                               dataset,
                                                               train_loader,
-                                                              verbose=False)
+                                                              verbose=True)
         # Save trained model
         save_model(model, name=f'test_gcn_v0_seed_{seed}.pt')
 

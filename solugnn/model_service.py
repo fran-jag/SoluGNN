@@ -37,8 +37,7 @@ Usage:
 from optimization import auto_optimize
 from model import initialize_standardizer, get_outputs
 from collection import retrieve_dataset, Graph
-
-from pathlib import Path
+from config import settings
 import torch
 
 
@@ -71,7 +70,7 @@ class ModelService:
         self.outputs = get_outputs(retrieve_dataset())
         self.standardizer = initialize_standardizer(self.outputs)
 
-    def load_model(self, model_name='gcn_v1.pt'):
+    def load_model(self):
         """
         Loads or builds a single model from a specified file path.
 
@@ -86,17 +85,18 @@ class ModelService:
         """
         assert self.multi_model is False, "multi_models is set to True. Use load_models()"  # noqa: E501
 
-        model_path = Path(f'../models/{model_name}')
+        model_path = f"{settings.model_path}/{settings.model_name}"
 
         if not model_path.exists():
             print("Model doesn't exist.")
             answer = input("Do you want to build a model? (y/n)")
             if answer.lower() == 'y':
-                model, rmse = auto_optimize(save=True, model_name=model_name)
+                model, rmse = auto_optimize(save=True,
+                                            model_name=settings.model_name)
                 print(f'GCN model built\nTrain RMSE: {rmse}')
                 print(f'Model saved at {model_path}')
                 self.model = model
-                return f'Model {model_name} built and loaded.'
+                return f'Model {settings.model_name} built and loaded.'
             elif answer.lower() == 'n':
                 return "Model won't be built."
             else:
@@ -105,9 +105,10 @@ class ModelService:
         # Load model and set to evaluation mode
         self.model = torch.load(model_path, weights_only=False)
         self.model.eval()
-        print(f'Model {model_name} loaded.')
+        print(f'Model {settings.model_name} loaded.')
 
-    def load_models(self, model_path='../models/'):
+    def load_models(self,
+                    model_path=settings.model_path):
         """
         Loads or builds multiple models from a specified directory.
 
@@ -122,7 +123,6 @@ class ModelService:
         """
         assert self.multi_model is True, "multi_models is set to False. Use load_model()"  # noqa: E501
 
-        model_path = Path(model_path)
         model_names = [file for file in model_path.glob('*.pt')
                        if file.is_file()]
 

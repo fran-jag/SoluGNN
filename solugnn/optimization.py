@@ -193,6 +193,9 @@ def auto_optimize(n_models: int = 1,
     """
     Automatically optimize the GCN model using Bayesian optimization.
 
+    Train and save optimized models. If n_models = N, trains N models with
+    N random seeds and saves it to path as 'optimized_gcn_seed_{seed}.pt'.
+
     Args:
         n_models (int, optional): Number of models to train with the best
             parameters. Defaults to 1.
