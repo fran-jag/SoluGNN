@@ -1,3 +1,48 @@
+"""
+Graph Convolutional Network (GCN) Model for Molecular Data
+
+This file implements a Graph Convolutional Network (GCN) to predict
+properties of molecules based on their graph structure. It includes
+convolutional and pooling layers for graph representation learning,
+utilities for data standardization, and methods to train, test,
+and save the model.
+
+Classes:
+    - ConvolutionLayer: A layer that performs convolution on graph nodes.
+    - PoolingLayer: Aggregates node features after convolution.
+    - ChemGCN: Defines the full GCN model for molecular data.
+    - Standardizer: Handles data standardization and restoration.
+
+Functions:
+    - initialize_model: Sets up the ChemGCN model with customizable
+        architecture parameters.
+    - run_epoch: Performs training for a single epoch.
+    - get_outputs: Extracts outputs from a dataset for standardization.
+    - initialize_standardizer: Initializes a standardizer for model outputs.
+    - initialize_optimizer: Sets up an optimizer for model training.
+    - initialize_loss: Returns the mean squared error loss function.
+    - train_all_epochs: Trains the model over a specified number of epochs.
+    - train_model: Configures and trains the model, returns training metrics.
+    - fix_random_seeds: Sets random seeds for reproducibility.
+    - save_model: Saves the trained model to a specified directory.
+    - test_model: Evaluates the model on a test dataset
+        and returns performance metrics.
+
+Dependencies:
+    - PyTorch: For model definition and training.
+    - Scikit-learn: For calculating performance metrics like MAE and RMSE.
+    - NumPy: For fixing random seeds.
+
+Usage:
+    Run the script to train and evaluate a GCN model on molecular data:
+    ```
+    python this_file.py
+    ```
+
+    Ensure `collection` module is available for `get_split_dataset_loaders`.
+"""
+
+
 import numpy as np
 import torch
 import torch.nn as nn
