@@ -75,6 +75,9 @@ class ModelService:
         self.standardizer = initialize_standardizer(self.outputs)
 
     def _set_globals(self):
+        """
+        Sets global permissions to safely load PyTorch models.
+        """
         torch.serialization.add_safe_globals([set,
                                               ChemGCN,
                                               ConvolutionLayer,
