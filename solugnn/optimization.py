@@ -154,10 +154,9 @@ def run_trials(client, n_trials: int = 20):
     """
     for _ in range(n_trials):
         parameters, trial_index = client.get_next_trial()
-        client.complete_trial(
-            trial_index=trial_index,
-            raw_data=train_test(parameters),
-        )
+        client.complete_trial(trial_index=trial_index,
+                              raw_data=train_test(parameters),
+                              )
 
 
 def get_trials_dataframe(client) -> pd.DataFrame:
@@ -193,8 +192,8 @@ def auto_optimize(n_models: int = 1,
     """
     Automatically optimize the GCN model using Bayesian optimization.
 
-    Train and save optimized models. If n_models = N, trains N models with
-    N random seeds and saves it to path as 'optimized_gcn_seed_{seed}.pt'.
+    Train and save optimized models. If n_models = N, train N models with
+    N random seeds and save it to path as 'optimized_gcn_seed_{seed}.pt'.
 
     Args:
         n_models (int, optional): Number of models to train with the best

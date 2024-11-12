@@ -44,7 +44,7 @@ python runner.py
 Expected output:
 ```
 SMILES: CC(=O)N1CCCC1
-Solvation free energy: -3.50 ± 0.12
+Solvation free energy: -4.92 ± 0.669
 ```
 
 ## Dependencies
