@@ -23,9 +23,13 @@ class Settings(BaseSettings):
     use_GPU: bool
     n_epochs: int
     learning_rate: float
+    log_level: str
 
 
 settings = Settings()
 
-
-logger.add('app.log', rotation='1 day', retention='2 days')
+logger.remove()
+logger.add('app.log',
+           rotation='1 day',
+           retention='2 days',
+           level=settings.log_level)

@@ -1,57 +1,101 @@
 
 # GCN Solubility Prediction
 
-This project aims to implement and deploy a Graph Convolutional Network (GCN) model for predicting the solubility of molecular compounds, based on their SMILES (Simplified Molecular Input Line Entry System) representations. This model architecture was chosen as the best performer in a previous exploratory study on solubility prediction. See ![Solvation Free Energy](https://github.com/fran-jag/solvation_free_energy). 
-
-Currently, the project is a **work in progress**.
+This project implements and deploys a **Graph Convolutional Network (GCN)** model for predicting solubility values of molecular compounds based on their **SMILES (Simplified Molecular Input Line Entry System)** representations. This GCN architecture builds on graph-based representations of molecules to provide accurate predictions of solubility.
 
 ## Project Overview
 
 ### Objective
-The main objective of this project is to build a robust GCN model that can predict solubility values of chemical compounds from their graph structures. It includes training, optimizing, and deploying the GCN model for real-time predictions.
+To create a robust GCN model capable of predicting solubility (e.g., solvation free energy) of chemical compounds by leveraging molecular graph representations. The project includes:
+- Training and optimization using Bayesian techniques.
+- Deployment for real-time predictions.
 
-### Key Components
+### Key Features
 
-1. **Model Definition**: Implements a GCN with graph convolutional and pooling layers to extract features from molecular graphs. The model architecture includes options for defining convolutional and hidden layers and applies dropout for regularization.
-2. **Optimization**: Uses Bayesian optimization to determine optimal hyperparameters, aiming to minimize the Root Mean Squared Error (RMSE).
-3. **Prediction Service**: A service class handles model loading, prediction on single or multiple models, and the generation of prediction statistics (mean, standard deviation) based on SMILES strings.
-4. **Data Handling**: Utilizes RDKit for SMILES to graph conversion, creating an adjacency matrix and feature matrices for each molecule.
-   
+1. **Model Architecture**:
+   - Implements GCN layers with graph convolutions and pooling operations.
+   - Flexible hyperparameter tuning for layers, dropout, and learning rates.
+   - Designed for scalable training on molecular datasets.
+
+2. **Bayesian Optimization**:
+   - Utilizes `Ax-platform` for Bayesian optimization.
+   - Finds the optimal hyperparameters (e.g., number of layers, learning rates) to minimize prediction error (RMSE).
+
+3. **Prediction Service**:
+   - Supports predictions using single or ensembles of models.
+   - Generates outputs with associated uncertainty (mean and standard deviation for ensemble models).
+
+4. **Molecular Data Handling**:
+   - Converts SMILES strings to graph representations using **RDKit**.
+   - Creates feature and adjacency matrices for GCN input.
+
+---
+
 ## Folder Structure
-- **model_service.py**: Contains `ModelService`, which manages model loading, building, and prediction.
-- **optimization.py**: Performs Bayesian optimization on the GCN, using `AxClient` to find the best hyperparameters for minimizing RMSE.
-- **runner.py**: Script for initializing the `ModelService`, loading models, and generating predictions.
-- **collection.py**: Manages the dataset and graph representation of molecules, including dataset loaders and utility functions.
-- **model.py**: Defines the GCN model architecture with convolutional and pooling layers, training, testing, and data standardization functionalities.
 
-## Usage
+- **`model.py`**:
+  Contains the implementation of the GCN model, including convolution, pooling layers, and utilities for training and testing.
 
-To use the model:
-1. **Train and Optimize**:
-   Run `optimization.py` to train the model and perform Bayesian optimization.
-   
-2. **Deploy and Predict**:
-   Use `runner.py` to initialize the `ModelService` with the optimized model. It accepts SMILES strings as input and provides predicted solubility values with uncertainty (mean ± standard deviation for multiple models).
+- **`optimization.py`**:
+  Automates hyperparameter tuning and model optimization using Bayesian optimization.
 
-## Example
+- **`runner.py`**:
+  Initializes the prediction service and makes predictions based on input SMILES strings.
 
-Example usage to predict the solubility free energy for a molecule (SMILES: `CC(=O)N1CCCC1`):
+- **`collection.py`**:
+  Manages the dataset, including molecule-to-graph conversion and data loading utilities.
 
-```python
-python runner.py
+- **`model_service.py`**:
+  Provides a unified service for loading models, running predictions, and managing single or multi-model setups.
+
+- **`config.py`**:
+  Defines project settings and configurations using environment variables.
+
+---
+
+## Setup Instructions
+
+### Dependencies  
+
+1. Clone the repository
+2. Install Poetry if not already installed:
+```bash
+pip install poetry
+```
+3. Install dependencies:
+```bash
+poetry install
 ```
 
-Expected output:
+### Configuration
+Modify `.env` or `config.py` to set paths and default parameters:
+- `data_file_name`: Path to the dataset CSV.
+- `model_path`: Directory to save/load trained models.
+- `node_vec_len`, `max_atoms`: Feature lengths for molecular graphs.
+- Other hyperparameters such as `learning_rate` and `n_epochs`.
+
+---
+
+## Workflow
+
+1. **Training and Optimization**:
+   - Use `runner.py` for automatic model optimization:
+     ```bash
+     poetry run python runner.py
+     ```
+
+---
+
+## Example Prediction
+
+**Input SMILES**: `CC(=O)N1CCCC1`  
+**Expected Output**:
 ```
 SMILES: CC(=O)N1CCCC1
-Solvation free energy: -4.92 ± 0.669
+Solubility free energy: -4.92 ± 0.669
 ```
 
-## Dependencies
-- **PyTorch**: For defining and training the GCN.
-- **Ax-platform (Meta)**: For Bayesian optimization.
-- **RDKit**: For chemical data processing (SMILES to graph).
-
+---
 ## Notes
 - This project is a **work in progress**. Further refinements to the model architecture and deployment are ongoing.
 - Ensure the `data/train.csv` dataset file is available for training.

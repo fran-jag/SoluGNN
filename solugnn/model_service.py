@@ -85,7 +85,7 @@ class ModelService:
                        torch.nn.modules.dropout.Dropout,
                        ]
 
-        logger.info(f'Following globals set as safe: {global_list}')
+        logger.debug(f'Following globals set as safe: {global_list}')
 
         torch.serialization.add_safe_globals(global_list)
 
@@ -155,7 +155,7 @@ class ModelService:
 
                 models, rmses = auto_optimize(save=True, n_models=n_models)
                 logger.info(f'{n_models} models built.')
-                logger.info(f'Saved at {model_path.parent}')
+                logger.info(f'Saved at {model_path}')
                 mean_rmse = sum(rmses) / len(rmses)
                 logger.info(f'Mean RMSE: {mean_rmse:.2f}')
                 self.models = [model.eval() for model in models]

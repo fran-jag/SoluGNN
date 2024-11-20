@@ -1,6 +1,8 @@
 from model_service import ModelService
+from loguru import logger
 
 
+@logger.catch
 def main():
     gcn_multi = ModelService(multi_model=True)
     gcn_multi._set_globals()

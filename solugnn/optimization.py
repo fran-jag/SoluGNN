@@ -159,6 +159,7 @@ def run_trials(client, n_trials: int = 20):
         client.complete_trial(trial_index=trial_index,
                               raw_data=train_test(parameters),
                               )
+        logger.info(f'Ran trial {trial_index}')
 
 
 def get_trials_dataframe(client) -> pd.DataFrame:
@@ -262,7 +263,7 @@ def auto_optimize(n_models: int = 1,
     run_base_trial(optimizer, base_parameters)
     run_trials(optimizer)
     best_parameters = get_best_parameters(optimizer)
-
+    logger.info(f'Finished trials.\nBest parameters: {best_parameters}')
     if n_models > 1:
         logger.info(f'Training {n_models} optimized models.')
         models = []
