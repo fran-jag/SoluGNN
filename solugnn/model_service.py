@@ -35,6 +35,7 @@ Usage:
     pred = service.get_pred(smile='CCO')  # For a single model
 """
 from optimization import auto_optimize
+from loguru import logger
 from model import (initialize_standardizer,
                    get_outputs,
                    ChemGCN,
@@ -78,15 +79,15 @@ class ModelService:
         """
         Sets global permissions to safely load PyTorch models.
         """
-        torch.serialization.add_safe_globals([set,
-                                              ChemGCN,
-                                              ConvolutionLayer,
-                                              PoolingLayer,
-                                              torch.nn.Linear,
-                                              torch.nn.modules.container.ModuleList,  # noqa: E501
-                                              torch.nn.modules.activation.LeakyReLU,  # noqa: E501
-                                              torch.nn.modules.dropout.Dropout,
-                                              ])
+        global_list = [set, ChemGCN, ConvolutionLayer, PoolingLayer,
+                       torch.nn.Linear, torch.nn.modules.container.ModuleList,
+                       torch.nn.modules.activation.LeakyReLU,
+                       torch.nn.modules.dropout.Dropout,
+                       ]
+
+        logger.info(f'Following globals set as safe: {global_list}')
+
+        torch.serialization.add_safe_globals(global_list)
 
     def load_model(self):
         """
@@ -111,10 +112,10 @@ class ModelService:
             if answer.lower() == 'y':
                 model, rmse = auto_optimize(save=True,
                                             model_name=settings.model_name)
-                print(f'GCN model built\nTrain RMSE: {rmse}')
-                print(f'Model saved at {model_path}')
+                logger.info(f'GCN model built\nTrain RMSE: {rmse}')
+                logger.info(f'Model saved at {model_path}')
                 self.model = model
-                return f'Model {settings.model_name} built and loaded.'
+                return None
             elif answer.lower() == 'n':
                 return "Model won't be built."
             else:
@@ -123,7 +124,7 @@ class ModelService:
         # Load model and set to evaluation mode
         self.model = torch.load(model_path, weights_only=True)
         self.model.eval()
-        print(f'Model {settings.model_name} loaded.')
+        logger.info(f'Model {settings.model_name} loaded.')
 
     def load_models(self,
                     model_path=settings.model_path):
@@ -153,12 +154,12 @@ class ModelService:
                 assert n_models != 1, "To load or build 1 model use load_model() instead"  # noqa: E501
 
                 models, rmses = auto_optimize(save=True, n_models=n_models)
-                print(f'{n_models} models built.')
-                print(f'Saved at {model_path.parent}')
+                logger.info(f'{n_models} models built.')
+                logger.info(f'Saved at {model_path.parent}')
                 mean_rmse = sum(rmses) / len(rmses)
-                print(f'Mean RMSE: {mean_rmse:.2f}')
+                logger.info(f'Mean RMSE: {mean_rmse:.2f}')
                 self.models = [model.eval() for model in models]
-                return f'{len(self.models)} models built and loaded.'
+                return None
 
             elif answer.lower() == 'n':
                 return "Model won't be built."
@@ -170,7 +171,7 @@ class ModelService:
 
         self.models = [model.eval() for model in self.models]
 
-        print(f'{len(self.models)} models found and loaded.')
+        logger.info(f'{len(self.models)} models found and loaded.')
 
     def get_pred(self, smile, model=None):
         """
@@ -184,6 +185,9 @@ class ModelService:
         Returns:
             float: The predicted output after standardization.
         """
+        if self.multi_model is False:
+            logger.info(f'Predicting for SMILE: {smile}')
+
         if model is None:
             model = self.model
 
@@ -222,7 +226,9 @@ class ModelService:
         Raises:
             AssertionError: If `multi_model` is set to False.
         """
+
         assert self.multi_model is True, "multi_models is set to False. Use get_pred()"  # noqa: E501
+        logger.info(f'Predicting for SMILE: {smile}')
 
         outputs = []
 
@@ -233,5 +239,8 @@ class ModelService:
         outputs_SS = sum([(x - outputs_mean)**2 for x in outputs])
         outputs_var = outputs_SS / len(outputs)
         outputs_std = outputs_var ** 0.5
+
+        logger.info(('solvation free energy:'
+                     f'{outputs_mean:.2f} ± {outputs_std:.3f}'))
 
         return outputs_mean, outputs_std

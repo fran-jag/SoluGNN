@@ -43,11 +43,12 @@ Usage:
 """
 
 
+from config import settings
+from loguru import logger
 import numpy as np
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 import torch
 import torch.nn as nn
-from sklearn.metrics import mean_absolute_error, root_mean_squared_error
-from config import settings
 
 
 class ConvolutionLayer(nn.Module):
@@ -443,7 +444,8 @@ def get_outputs(dataset):
     return [data[1] for data in dataset]
 
 
-def initialize_standardizer(outputs):
+def initialize_standardizer(outputs,
+                            log: bool = True):
     """
     Initialize the Standardizer with outputs.
 
@@ -453,6 +455,8 @@ def initialize_standardizer(outputs):
     Returns:
         Standardizer: Initialized Standardizer.
     """
+    if log:
+        logger.info('Created standardizer from outputs')
     return Standardizer(torch.Tensor(outputs))
 
 
@@ -531,6 +535,7 @@ def train_model(
     verbose: bool = True,
     n_epochs: int = settings.n_epochs,
     lr: float = settings.learning_rate,
+    log: bool = True
 ):
     """
     Train the model.
@@ -551,7 +556,7 @@ def train_model(
     """
     # Standardizer
     outputs = get_outputs(dataset)
-    standardizer = initialize_standardizer(outputs)
+    standardizer = initialize_standardizer(outputs, log=log)
     # Optimizer
     optimizer = initialize_optimizer(model, lr)
     # Loss function
@@ -692,7 +697,7 @@ if __name__ == '__main__':
                                                               train_loader,
                                                               verbose=True)
         # Save trained model
-        save_model(model, name=f'test_gcn_v0_seed_{seed}.pt')
+        # save_model(model, name=f'test_gcn_v0_seed_{seed}.pt')
 
         # Test trained model
         test_loss, test_mae, test_rmse = test_model(model,

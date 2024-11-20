@@ -29,6 +29,7 @@ Usage:
 """
 
 from collection import get_split_dataset_loaders
+from loguru import logger
 from model import (
     fix_random_seeds,
     initialize_model,
@@ -63,7 +64,7 @@ def train_test(parameters, output_model: bool = False):
     learning_rate = parameters['learning_rate']      # Default = 0.01
 
     # Create dataloaders
-    dataset, train_loader, test_loader = get_split_dataset_loaders()
+    dataset, train_loader, test_loader = get_split_dataset_loaders(log=False)  # noqa: E501
 
     # Initialize and train model
     model = initialize_model(
@@ -77,6 +78,7 @@ def train_test(parameters, output_model: bool = False):
         train_loader,
         lr=learning_rate,
         verbose=False,
+        log=False,
     )
 
     # Test trained model
@@ -206,6 +208,7 @@ def auto_optimize(n_models: int = 1,
             - If n_models > 1, returns a tuple (models, rmses).
             - If n_models == 1, returns a tuple (model, rmse).
     """
+    logger.info('Start auto-optimization with Ax-platform.')
     fix_random_seeds()
     optimizer = initialize_client()
 
@@ -239,6 +242,9 @@ def auto_optimize(n_models: int = 1,
     ]
     objectives = {"rmse": ObjectiveProperties(minimize=True)}
 
+    logger.debug(f'Created experiment with parameters:\n{parameters}')
+    logger.debug(f'Optimization objective(s): {objectives}')
+
     create_experiment(
         optimizer,
         name="GCN optimization",
@@ -258,9 +264,12 @@ def auto_optimize(n_models: int = 1,
     best_parameters = get_best_parameters(optimizer)
 
     if n_models > 1:
+        logger.info(f'Training {n_models} optimized models.')
         models = []
         rmses = []
+        random.seed(None)
         seeds = random.randint(0, 256, n_models)
+        logger.debug(f'Random seeds: {seeds}')
 
         for i in seeds:
             fix_random_seeds(i)
@@ -271,12 +280,12 @@ def auto_optimize(n_models: int = 1,
                     model,
                     name=f'optimized_gcn_seed_{i}.pt',
                 )
-                print(f"Model optimized_gcn_seed_{i}.pt saved")
+                logger.info(f"Saved model optimized_gcn_seed_{i}.pt")
             models.append(model)
             rmses.append(rmse)
 
         return models, rmses
-
+    logger.info(f'Training model {model_name}')
     model, rmse = train_test(best_parameters, output_model=True)
 
     if save:
@@ -284,7 +293,7 @@ def auto_optimize(n_models: int = 1,
             model,
             name=model_name,
         )
-        print(f"Model saved as {model_name}")
+        logger.info(f'Saved model as {model_name}')
 
     return model, rmse
 

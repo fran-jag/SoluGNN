@@ -1,6 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import DirectoryPath, FilePath
 
+from loguru import logger
+
 
 class Settings(BaseSettings):
 
@@ -24,3 +26,6 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+logger.add('app.log', rotation='1 day', retention='2 days')

@@ -16,6 +16,8 @@ from rdkit import Chem
 from rdkit.Chem import rdmolops, rdDistGeom
 from torch.utils.data import Dataset, DataLoader
 
+from loguru import logger
+
 
 class Graph:
     """
@@ -273,6 +275,7 @@ def retrieve_dataset(
     max_atoms: int = settings.max_atoms,
     node_vec_len: int = settings.node_vec_len,
     dataset_path: str = settings.data_file_name,
+    log: bool = True
 ) -> GraphDataset:
     """
     Retrieves the GraphDataset from the given CSV file path.
@@ -288,6 +291,9 @@ def retrieve_dataset(
     Returns:
         GraphDataset: The loaded graph dataset.
     """
+    if log:
+        logger.info(f'Loaded CSV in {dataset_path}')
+
     dataset = GraphDataset(
         dataset_path=dataset_path,
         max_atoms=max_atoms,
@@ -329,7 +335,7 @@ def get_sizes(dataset,
     return train_size, test_size
 
 
-def sample_train_test(dataset_indices, train_size):
+def sample_train_test(dataset_indices, train_size, log: bool = True):
     """
     Randomly samples indices for training and testing.
 
@@ -346,6 +352,9 @@ def sample_train_test(dataset_indices, train_size):
                                      size=train_size,
                                      replace=False)
     test_indices = np.array(list(set(dataset_indices) - set(train_indices)))
+    if log:
+        logger.info(f'Split data in {train_indices.size} points for training,'
+                    f' and {test_indices.size} for testing.')
     return train_indices, test_indices
 
 
@@ -408,7 +417,7 @@ def get_dataloaders(dataset,
     return train_loader, test_loader
 
 
-def get_split_dataset_loaders():
+def get_split_dataset_loaders(log=True):
     """
     Retrieves dataset and splits it into train and test DataLoader objects.
 
@@ -419,13 +428,14 @@ def get_split_dataset_loaders():
             - DataLoader: DataLoader for testing data.
     """
     # Get sizes
-    dataset = retrieve_dataset()
+    dataset = retrieve_dataset(log=log)
     dataset_indices = get_indices(dataset)
     train_size, test_size = get_sizes(dataset)
 
     # Randomly sample train and test indices
     train_indices, test_indices = sample_train_test(dataset_indices,
-                                                    train_size)
+                                                    train_size,
+                                                    log=log)
 
     # Create dataloaders
     train_loader, test_loader = get_dataloaders(dataset,
