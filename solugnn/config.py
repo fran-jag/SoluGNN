@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import DirectoryPath, FilePath
+from pydantic import DirectoryPath 
 from sqlalchemy import create_engine
 from loguru import logger
 
@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     model_config['protected_namespaces'] = ('settings_',)
 
     db_conn_str: str
-    data_file_name: FilePath
     model_path: DirectoryPath
     model_name: str
     node_vec_len: int

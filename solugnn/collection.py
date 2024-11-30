@@ -234,7 +234,6 @@ class GraphDataset(Dataset):
 
 
 def load_from_db():
-
     logger.info("Loading data from database")
     query = select(SolvationMolecules)
     return pd.read_sql(query, engine)
@@ -282,7 +281,6 @@ def collate_graph_dataset(dataset: Dataset):
 def retrieve_dataset(
     max_atoms: int = settings.max_atoms,
     node_vec_len: int = settings.node_vec_len,
-    dataset_path: str = settings.data_file_name,
     log: bool = True
 ) -> GraphDataset:
     """
