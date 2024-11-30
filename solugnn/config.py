@@ -10,6 +10,7 @@ class Settings(BaseSettings):
                                       env_file_encoding='utf-8')
     model_config['protected_namespaces'] = ('settings_',)
 
+    db_conn_str: str
     data_file_name: FilePath
     model_path: DirectoryPath
     model_name: str
@@ -34,4 +35,4 @@ logger.add('app.log',
            retention='2 days',
            level=settings.log_level)
 
-engine = create_engine('sqlite:////home/papafrita/projects/soluGNN/data/db.sqlite')  # noqa: E501
+engine = create_engine(settings.db_conn_str)  # noqa: E501

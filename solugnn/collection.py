@@ -168,7 +168,6 @@ class GraphDataset(Dataset):
 
     def __init__(
         self,
-        dataset_path: str,
         node_vec_len: int = settings.node_vec_len,
         max_atoms: int = settings.max_atoms,
     ) -> None:
@@ -300,11 +299,8 @@ def retrieve_dataset(
     Returns:
         GraphDataset: The loaded graph dataset.
     """
-    if log:
-        logger.info(f'Loaded CSV in {dataset_path}')
 
     dataset = GraphDataset(
-        dataset_path=dataset_path,
         max_atoms=max_atoms,
         node_vec_len=node_vec_len,
     )
