@@ -34,4 +34,4 @@ logger.add('app.log',
            retention='2 days',
            level=settings.log_level)
 
-engine = create_engine('sqlite:////home/papafrita/projects/soluGNN/db.sqlite')
+engine = create_engine('sqlite:////home/papafrita/projects/soluGNN/data/db.sqlite')  # noqa: E501
