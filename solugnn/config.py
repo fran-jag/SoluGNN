@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import DirectoryPath, FilePath
-
+from sqlalchemy import create_engine
 from loguru import logger
 
 
@@ -33,3 +33,5 @@ logger.add('app.log',
            rotation='1 day',
            retention='2 days',
            level=settings.log_level)
+
+engine = create_engine('sqlite:////home/papafrita/projects/soluGNN/db.sqlite')

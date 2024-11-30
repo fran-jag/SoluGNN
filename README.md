@@ -91,8 +91,7 @@ Modify `.env` or `config.py` to set paths and default parameters:
 **Input SMILES**: `CC(=O)N1CCCC1`  
 **Expected Output**:
 ```
-SMILES: CC(=O)N1CCCC1
-Solubility free energy: -4.92 ± 0.669
+CC(=O)N1CCCC1 SFE: -5.14 ± 0.513
 ```
 
 ---

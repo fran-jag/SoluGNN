@@ -6,11 +6,13 @@ strings into graph representations using RDKit and to handle datasets
 of such graphs for machine learning purposes.
 """
 
+from db_model import SolvationMolecules
 import numpy as np
 import pandas as pd
+from sqlalchemy import select
 import torch
 from torch.utils.data.sampler import SubsetRandomSampler
-from config import settings
+from config import settings, engine
 
 from rdkit import Chem
 from rdkit.Chem import rdmolops, rdDistGeom
@@ -183,7 +185,7 @@ class GraphDataset(Dataset):
         self.max_atoms = max_atoms
 
         # Load dataset file
-        df = pd.read_csv(dataset_path)
+        df = load_from_db()
 
         # Extract columns
         self.indices = df.index.tolist()
@@ -230,6 +232,13 @@ class GraphDataset(Dataset):
         output = torch.Tensor([self.outputs[i]])
 
         return (node_mat, adj_mat), output, smile
+
+
+def load_from_db():
+
+    logger.info("Loading data from database")
+    query = select(SolvationMolecules)
+    return pd.read_sql(query, engine)
 
 
 def collate_graph_dataset(dataset: Dataset):

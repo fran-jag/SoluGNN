@@ -1,51 +1,35 @@
-2024-11-20 16:16:17.764 | INFO     | collection:retrieve_dataset:295 - Loaded CSV in ../data/train.csv
-2024-11-20 16:16:17.997 | INFO     | model:initialize_standardizer:459 - Created standardizer from outputs
-2024-11-20 16:16:17.998 | INFO     | model_service:_set_globals:88 - Following globals set as safe: [<class 'set'>, <class 'model.ChemGCN'>, <class 'model.ConvolutionLayer'>, <class 'model.PoolingLayer'>, <class 'torch.nn.modules.linear.Linear'>, <class 'torch.nn.modules.container.ModuleList'>, <class 'torch.nn.modules.activation.LeakyReLU'>, <class 'torch.nn.modules.dropout.Dropout'>]
-2024-11-20 16:16:21.777 | INFO     | optimization:auto_optimize:212 - Start auto-optimization with Ax-platform.
-2024-11-20 16:16:21.781 | DEBUG    | optimization:auto_optimize:246 - Created experiment with parameters:
-[{'name': 'hidden_nodes', 'type': 'range', 'bounds': [10, 100], 'value_type': 'int', 'log_scale': False}, {'name': 'n_conv_layers', 'type': 'range', 'bounds': [1, 10], 'value_type': 'int'}, {'name': 'n_hidden_layers', 'type': 'range', 'bounds': [1, 10], 'value_type': 'int'}, {'name': 'learning_rate', 'type': 'range', 'bounds': [1e-06, 0.1], 'value_type': 'float', 'log_scale': True}]
-2024-11-20 16:16:21.781 | DEBUG    | optimization:auto_optimize:247 - Optimization objective(s): {'rmse': ObjectiveProperties(minimize=True, threshold=None)}
-2024-11-20 16:17:27.165 | INFO     | optimization:run_trials:162 - Ran trial 1
-2024-11-20 16:18:03.882 | INFO     | optimization:run_trials:162 - Ran trial 2
-2024-11-20 16:18:31.747 | INFO     | optimization:run_trials:162 - Ran trial 3
-2024-11-20 16:19:07.415 | INFO     | optimization:run_trials:162 - Ran trial 4
-2024-11-20 16:19:38.792 | INFO     | optimization:run_trials:162 - Ran trial 5
-2024-11-20 16:20:12.705 | INFO     | optimization:run_trials:162 - Ran trial 6
-2024-11-20 16:20:46.243 | INFO     | optimization:run_trials:162 - Ran trial 7
-2024-11-20 16:21:21.623 | INFO     | optimization:run_trials:162 - Ran trial 8
-2024-11-20 16:21:51.231 | INFO     | optimization:run_trials:162 - Ran trial 9
-2024-11-20 16:22:29.003 | INFO     | optimization:run_trials:162 - Ran trial 10
-2024-11-20 16:23:07.392 | INFO     | optimization:run_trials:162 - Ran trial 11
-2024-11-20 16:23:34.960 | INFO     | optimization:run_trials:162 - Ran trial 12
-2024-11-20 16:24:07.367 | INFO     | optimization:run_trials:162 - Ran trial 13
-2024-11-20 16:24:37.467 | INFO     | optimization:run_trials:162 - Ran trial 14
-2024-11-20 16:25:08.772 | INFO     | optimization:run_trials:162 - Ran trial 15
-2024-11-20 16:25:38.045 | INFO     | optimization:run_trials:162 - Ran trial 16
-2024-11-20 16:26:10.030 | INFO     | optimization:run_trials:162 - Ran trial 17
-2024-11-20 16:26:43.093 | INFO     | optimization:run_trials:162 - Ran trial 18
-2024-11-20 16:27:18.634 | INFO     | optimization:run_trials:162 - Ran trial 19
-2024-11-20 16:27:55.635 | INFO     | optimization:run_trials:162 - Ran trial 20
-2024-11-20 16:27:55.959 | INFO     | optimization:auto_optimize:266 - Finished trials.
-Best parameters: {'hidden_nodes': 100, 'n_conv_layers': 2, 'n_hidden_layers': 4, 'learning_rate': 0.0019525284479789753}
-2024-11-20 16:27:55.959 | INFO     | optimization:auto_optimize:268 - Training 5 optimized models.
-2024-11-20 16:27:55.960 | DEBUG    | optimization:auto_optimize:273 - Random seeds: [201 131 136  75 241]
-2024-11-20 16:28:25.947 | INFO     | optimization:auto_optimize:284 - Saved model optimized_gcn_seed_201.pt
-2024-11-20 16:28:56.041 | INFO     | optimization:auto_optimize:284 - Saved model optimized_gcn_seed_131.pt
-2024-11-20 16:29:26.274 | INFO     | optimization:auto_optimize:284 - Saved model optimized_gcn_seed_136.pt
-2024-11-20 16:29:56.871 | INFO     | optimization:auto_optimize:284 - Saved model optimized_gcn_seed_75.pt
-2024-11-20 16:30:27.409 | INFO     | optimization:auto_optimize:284 - Saved model optimized_gcn_seed_241.pt
-2024-11-20 16:30:27.409 | INFO     | model_service:load_models:157 - 5 models built.
-2024-11-20 16:30:27.409 | INFO     | model_service:load_models:158 - Saved at ../models
-2024-11-20 16:30:27.409 | INFO     | model_service:load_models:160 - Mean RMSE: 1.30
-2024-11-20 16:30:27.410 | INFO     | model_service:get_preds:231 - Predicting for SMILE: CC(=O)N1CCCC1
-2024-11-20 16:30:27.425 | INFO     | model_service:get_preds:243 - solvation free energy:-5.14 ± 0.513
-2024-11-20 16:30:27.425 | INFO     | model_service:get_preds:231 - Predicting for SMILE: CCCCCCCC(=O)OC
-2024-11-20 16:30:27.439 | INFO     | model_service:get_preds:243 - solvation free energy:-2.53 ± 0.075
-2024-11-20 16:32:10.283 | INFO     | collection:retrieve_dataset:295 - Loaded CSV in ../data/train.csv
-2024-11-20 16:32:10.514 | INFO     | model:initialize_standardizer:459 - Created standardizer from outputs
-2024-11-20 16:32:10.515 | INFO     | model_service:_set_globals:88 - Following globals set as safe: [<class 'set'>, <class 'model.ChemGCN'>, <class 'model.ConvolutionLayer'>, <class 'model.PoolingLayer'>, <class 'torch.nn.modules.linear.Linear'>, <class 'torch.nn.modules.container.ModuleList'>, <class 'torch.nn.modules.activation.LeakyReLU'>, <class 'torch.nn.modules.dropout.Dropout'>]
-2024-11-20 16:32:11.089 | INFO     | model_service:load_models:174 - 5 models found and loaded.
-2024-11-20 16:32:11.089 | INFO     | model_service:get_preds:231 - Predicting for SMILE: CC(=O)N1CCCC1
-2024-11-20 16:32:11.211 | INFO     | model_service:get_preds:243 - solvation free energy:-5.14 ± 0.513
-2024-11-20 16:32:11.211 | INFO     | model_service:get_preds:231 - Predicting for SMILE: CCCCCCCC(=O)OC
-2024-11-20 16:32:11.222 | INFO     | model_service:get_preds:243 - solvation free energy:-2.53 ± 0.075
+2024-11-30 17:22:39.239 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:22:39.241 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:29:42.848 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:29:42.848 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:31:18.037 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:31:18.038 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:32:02.858 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:32:02.858 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:32:24.340 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:32:24.340 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:36:54.144 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:36:54.144 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:43:03.579 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:43:03.579 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:43:40.546 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:43:40.547 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:44:15.150 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:44:15.150 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:47:42.678 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:47:42.679 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:51:07.064 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:51:07.064 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:51:23.159 | INFO     | __main__:retrieve_dataset:305 - Loaded CSV in ../data/train.csv
+2024-11-30 17:51:23.159 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:53:15.696 | INFO     | __main__:retrieve_dataset:304 - Loaded CSV in ../data/train.csv
+2024-11-30 17:53:15.696 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 17:58:25.439 | INFO     | __main__:retrieve_dataset:304 - Loaded CSV in ../data/train.csv
+2024-11-30 17:58:25.440 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 18:00:17.679 | INFO     | __main__:retrieve_dataset:304 - Loaded CSV in ../data/train.csv
+2024-11-30 18:00:17.679 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 18:03:03.558 | INFO     | __main__:load_from_db:238 - Loading data from database
+2024-11-30 18:06:47.175 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 18:07:55.250 | INFO     | __main__:load_from_db:239 - Loading data from database
+2024-11-30 18:08:25.165 | INFO     | __main__:retrieve_dataset:304 - Loaded CSV in ../data/train.csv
+2024-11-30 18:08:25.165 | INFO     | __main__:load_from_db:239 - Loading data from database
