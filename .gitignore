@@ -1,5 +1,4 @@
 /data/
-/models/
-/notebooks/
 .vscode/
 .venv/
+/solugnn/model/models/

@@ -28,9 +28,9 @@ Usage:
     to customize the optimization.
 """
 
-from collection import get_split_dataset_loaders
+from model.pipeline.collection import get_split_dataset_loaders
 from loguru import logger
-from model import (
+from model.pipeline.model import (
     fix_random_seeds,
     initialize_model,
     train_model,

@@ -1,12 +1,12 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import DirectoryPath 
+from pydantic import DirectoryPath
 from sqlalchemy import create_engine
 from loguru import logger
 
 
 class Settings(BaseSettings):
 
-    model_config = SettingsConfigDict(env_file='.env',
+    model_config = SettingsConfigDict(env_file='config/.env',
                                       env_file_encoding='utf-8')
     model_config['protected_namespaces'] = ('settings_',)
 
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 settings = Settings()
 
 logger.remove()
-logger.add('app.log',
+logger.add('logs/app.log',
            rotation='1 day',
            retention='2 days',
            level=settings.log_level)

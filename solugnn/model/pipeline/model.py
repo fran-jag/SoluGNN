@@ -43,7 +43,7 @@ Usage:
 """
 
 
-from config import settings
+from config.config import settings
 from loguru import logger
 import numpy as np
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
@@ -681,7 +681,7 @@ def test_model(
 
 if __name__ == '__main__':
     # Workflow
-    from collection import get_split_dataset_loaders
+    from model.pipeline.collection import get_split_dataset_loaders
 
     for seed in [6969]:
         # Fix Seeds

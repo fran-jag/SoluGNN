@@ -34,15 +34,15 @@ Usage:
     mean, std = service.get_preds(smile='CCO')  # For multiple models
     pred = service.get_pred(smile='CCO')  # For a single model
 """
-from optimization import auto_optimize
+from model.pipeline.optimization import auto_optimize
 from loguru import logger
-from model import (initialize_standardizer,
-                   get_outputs,
-                   ChemGCN,
-                   ConvolutionLayer,
-                   PoolingLayer)
-from collection import retrieve_dataset, Graph
-from config import settings
+from model.pipeline.model import (initialize_standardizer,
+                                  get_outputs,
+                                  ChemGCN,
+                                  ConvolutionLayer,
+                                  PoolingLayer)
+from model.pipeline.collection import retrieve_dataset, Graph
+from config.config import settings
 import torch
 
 

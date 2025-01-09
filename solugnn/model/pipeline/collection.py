@@ -6,13 +6,13 @@ strings into graph representations using RDKit and to handle datasets
 of such graphs for machine learning purposes.
 """
 
-from db_model import SolvationMolecules
+from db.db_model import SolvationMolecules
 import numpy as np
 import pandas as pd
 from sqlalchemy import select
 import torch
 from torch.utils.data.sampler import SubsetRandomSampler
-from config import settings, engine
+from config.config import settings, engine
 
 from rdkit import Chem
 from rdkit.Chem import rdmolops, rdDistGeom
